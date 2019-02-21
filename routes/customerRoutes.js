@@ -5,7 +5,7 @@ const router                    = require('express').Router()
 const customerController        = require('../controller/customerController')
 const bcrypt                    = require('../libs/bcrypt')
 const token                     = require('../libs/token')
-const CONSTANTS                     = require('../properties/constants')
+const CONSTANTS                 = require('../properties/constants')
 
 module.exports                  = router
 

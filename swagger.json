@@ -1,0 +1,283 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "description": "Swagger for assignment 3",
+        "title": "Swagger"
+    },
+    "host": "localhost:3000",
+    "basePath": "/",
+    "schemes": [
+        "http"
+    ],
+    "tags": [{
+            "name": "Customer",
+            "description": "Customer APIs"
+        },
+        {
+            "name": "Driver",
+            "description": "Driver APIs"
+        },
+        {
+            "name": "Booking",
+            "description": "Booking APIs"
+        },
+        {
+            "name": "Admin",
+            "description": "Admin APIs"
+        }
+    ],
+    "paths": {
+        "/customer/register": {
+            "post": {
+                "tags": [
+                    "Customer"
+                ],
+                "description": "Registeration",
+                "parameters": [{
+                        "type": "string",
+                        "description": "UserName",
+                        "name": "username",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Password",
+                        "name": "password",
+                        "in": "formData"
+                    }
+
+                ]
+            }
+        },
+        "/customer/login": {
+            "post": {
+                "tags": [
+                    "Customer"
+                ],
+                "description": "Login in the customer",
+                "parameters": [{
+                        "type": "string",
+                        "description": "email",
+                        "name": "email",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "password",
+                        "name": "password",
+                        "in": "formData"
+                    }
+                ]
+            }
+        },
+        "/customer/create-booking": {
+            "post": {
+                "tags": [
+                    "Customer"
+                ],
+                "description": "Create a booking for user from source to destination",
+                "parameters": [{
+                        "type": "string",
+                        "description": "customer email",
+                        "name": "email",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "from_latitude",
+                        "name": "fromLat",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "from_longitude",
+                        "name": "fromLong",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "to_latitude",
+                        "name": "toLat",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "to_longitude",
+                        "name": "toLong",
+                        "in": "formData"
+                    }
+                ]
+            }
+        },
+        "/customer/view-bookings": {
+            "get": {
+                "tags": [
+                    "Customer"
+                ],
+                "description": "Get booking history of the client",
+                "parameters": [{
+                    "type": "string",
+                    "description": "customer email",
+                    "name": "email",
+                    "in": "formData"
+                }]
+            }
+        },
+        "/driver/register": {
+            "post": {
+                "tags": [
+                    "Driver"
+                ],
+                "description": "Register driver",
+                "parameters": [{
+                        "type": "string",
+                        "description": "username",
+                        "name": "username",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "driver email",
+                        "name": "email",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "password",
+                        "name": "password",
+                        "in": "formData"
+                    }
+                ]
+            }
+        },
+        "/driver/login": {
+            "post": {
+                "tags": [
+                    "Driver"
+                ],
+                "description": "Login in the user",
+                "parameters": [{
+                        "type": "string",
+                        "description": "driver email",
+                        "name": "email",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Password",
+                        "name": "password",
+                        "in": "formData"
+                    }
+                ]
+            }
+        },
+        "/driver/complete-booking": {
+            "put": {
+                "tags": [
+                    "Driver"
+                ],
+                "description": "Complete current bookingr",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "driver email",
+                        "name": "email",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "booking id",
+                        "name": "booking_id",
+                        "in": "formData"
+                    }
+                ]
+            }
+        },
+        "/driver/view-bookings": {
+            "get": {
+                "tags": [
+                    "Driver"
+                ],
+                "description": "Get booking history of the driver",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "driver email",
+                        "name": "email",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "view completed(1) or current booking(0)",
+                        "name": "completed",
+                        "in": "formData"
+                    }
+                ]
+            }
+        },
+        "/admin/login": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Login the admin",
+                "parameters": [{
+                        "type": "string",
+                        "description": "email",
+                        "name": "email",
+                        "in": "formData"
+                    }
+                ]
+            }
+        },
+        "/admin/assign-booking": {
+            "put": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Assign idle drivers to pending bookings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Admin email",
+                        "name": "email",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "driver_id",
+                        "name": "driver_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "booking_id",
+                        "name": "booking_id",
+                        "in": "formData"
+                    }
+                ]
+            }
+        },
+        "/admin/getAllBookings": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Get complete details of a booking",
+                "parameters": [{
+                    "type": "string",
+                    "description": "admin email",
+                    "name": "email",
+                    "in": "formData"
+                }]
+            }
+        }
+    }
+}
