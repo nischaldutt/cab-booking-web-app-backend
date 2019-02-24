@@ -1,3 +1,4 @@
+
 //********** CUSTOMER ROUTES **********/
 
 const router                    = require('express').Router()
@@ -16,7 +17,7 @@ router.post('/register', bcrypt.hashPassword, customerController.registerCustome
 router.post('/login', customerController.login, token.createToken('customers'))
 
 //CUSTOMER CREATES BOOKING
-router.post('/create-booking', token.accessToken('customers'), customerController.createBooking)
+router.post('/create-booking', customerController.createBooking)
 
 //CUSTOMER VIEWS BOOKINGS
-router.get('/view-bookings', token.accessToken('customers'), customerController.viewBookings)
+router.get('/view-bookings', customerController.viewBookings)

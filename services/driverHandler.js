@@ -1,3 +1,4 @@
+
 //********** DRIVER HANDLER **********/
 
 const Promise                       = require('bluebird')
@@ -6,7 +7,12 @@ const connection                    = require('../database/mysql')
 const bcrypt                        = require('../libs/bcrypt')
 const CONSTANTS                     = require('../properties/constants')
 const db                            = require('../database/mongodb')
+const driverUtilities               = require('../utilities/driverUtilities')
 
+/* 
+* @function <b>updateLogs </b> <br>
+* updatelogs in mongo db
+*/
 const updateLogs = (driver_id, booking_id, completion_time) => {
     return db.getDB().collection('logs').updateOne(
         {booking_id: booking_id},
@@ -22,8 +28,10 @@ const updateLogs = (driver_id, booking_id, completion_time) => {
 */
 const selectPassword = (driverObj) => {
     return new Promise((resolve, reject) => {
-        connection.query(`SELECT hash from drivers WHERE email = ?`, driverObj.email, (err, result) => {
-            (err) ? reject(err) : resolve(checkPassword(driverObj, result[0].hash))
+        connection.query(`SELECT hash from drivers WHERE email = ?`, driverObj.email, 
+        (err, result) => {
+            (err) ? reject(err) : 
+            resolve(checkPassword(driverObj, result[0].hash))
         })
     })
 }
@@ -35,11 +43,11 @@ const selectPassword = (driverObj) => {
 * @param {String} password
 * @return {resolved Promise} adminObj
 */
-const checkPassword = (driverObj, hash) => {
+let checkPassword = (userObj, hash) => {
     return new Promise((resolve, reject) => {
-        bcrypt.matchPassword(driverObj.password, hash)
-            .then(result => resolve(result))
-            .catch(err => reject(err))
+        bcrypt.matchPassword(userObj.password, hash)
+        .then(() => resolve(driverUtilities.loginSuccessfull(userObj)))
+        .catch(() => reject(driverUtilities.incorrectPassword()))
     })
 }
 
@@ -64,9 +72,16 @@ module.exports.getDriverId = (email) => {
 * @return {resolved Promise} response
 */
 module.exports.addNewCredentials = (obj) => {
+
+    delete obj.password
+    obj.hash = bcrypt.hashPass
+    
     return new Promise((resolve, reject) => {
-        connection.query(`INSERT INTO drivers SET ?`, obj, (err, result) => {
-            (err) ? reject(err) : resolve(result)
+        connection.query(`INSERT INTO drivers SET ?`, obj, 
+        (err, result) => {
+            (err) ? 
+            reject(driverUtilities.driverAlreadyExists(err, result)) : 
+            resolve(driverUtilities.newDriverAdded(obj))
         })
     })
 }
@@ -77,18 +92,30 @@ module.exports.addNewCredentials = (obj) => {
 * @param {Object} admin 
 * @return {resolved Promise} response
 */
-module.exports.checkIfDriverExists = (driver, res) => {
+module.exports.checkIfDriverExists = (user) => {
     return new Promise((resolve, reject) => {
-        connection.query(`SELECT * FROM drivers WHERE email = '${driver.email}'`, (err, result) => {
-          ((result.length === 0 ) || (err)) ? 
-            res.status(CONSTANTS.responseFlags.USER_NOT_FOUND).send({
-                data: {
-                    error: 'user not registered',
-                },
-                statusCode: CONSTANTS.responseFlags.USER_NOT_FOUND,
-                message: "User not registered!"
-            }) : 
-        resolve(selectPassword(driver))
+        connection.query(`SELECT * FROM drivers WHERE email = '${user.email}'`, 
+        (err, result) => {
+            ((err) || (result.length === 0)) ? 
+            reject(driverUtilities.driverNotRegistered(user.username)) : 
+            resolve(driverUtilities.selectPassword(user)) 
+        })
+    })
+}
+
+/* 
+* @function <b>checkIfAdminExists </b> <br>
+* check if admin already exists in DB
+* @param {Object} admin 
+* @return {resolved Promise} response
+*/
+module.exports.checkIfDriverAlredyExists = (user) => {
+    return new Promise((resolve, reject) => {
+        connection.query(`SELECT * FROM drivers WHERE email = '${user.email}'`, 
+        (err, result) => {
+            ((err) || (result.length !== 0)) ? 
+            reject(driverUtilities.driverAlreadyExists(err, result)) : 
+            resolve(driverUtilities.newDriverAdded(result))
         })
     })
 }
@@ -106,8 +133,8 @@ module.exports.completeBooking = (driver_id, booking_id, completion_time) => {
                           UPDATE drivers SET assigned = 0 WHERE driver_id = '${driver_id}'`, 
         (err, result) => {
             (err) ? reject(err) : 
-            updateLogs(driver_id, booking_id, completion_time)
-            resolve(result)
+            (updateLogs(driver_id, booking_id, completion_time),
+            resolve(driverUtilities.bookingCompleted(driver_id, booking_id)))
         })
     })
 }
@@ -125,7 +152,9 @@ module.exports.getDriverBookings = (driver_id, completed) => {
                           INNER JOIN drivers ON drivers.driver_id = bookings.driver_id 
                           WHERE completed = '${completed}'`, 
             (err, result) => {
-                (err) ? reject(err) : resolve(result)
+            (err) ? 
+            reject(err) : 
+            resolve(driverUtilities.allBookings(result))
         })
     })
 }

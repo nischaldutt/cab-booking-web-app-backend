@@ -1,6 +1,28 @@
-/******* DRIVER VALIDATOR *******/
 
-const joi = require('joi')
+/******* DRIVER INPUT VALIDATOR *******/
+
+const joi                       = require('joi')
+const CONSTANTS                 = require('../properties/constants')
+
+const validatedObject = (result) => {
+    return {
+        data: {
+            message: result,
+        },
+        statusCode: CONSTANTS.responseFlags.VALIDATION_SUCCESS,
+        message: "Validated!"
+    }
+}
+
+const invalidObject = (err) => {
+    return {
+        data: {
+            error: err.details[0].message,
+        },
+        statusCode: CONSTANTS.responseFlags.INVALID_INPUT,
+        message: "Validation error!"
+    }
+}
 
 /* 
 * @function <b>validateRegister </b> <br>
@@ -10,7 +32,7 @@ const joi = require('joi')
 * @param {String} password
 * @return {json object} response
 */
-module.exports.validateRegister = (req, res) => {
+module.exports.validateRegister = (driver) => {
     let schema = joi.object().keys({
         username: joi.string().alphanum().min(3).max(30).required(),
         password: joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required(),
@@ -18,8 +40,8 @@ module.exports.validateRegister = (req, res) => {
     })
 
     return new Promise((resolve, reject) => {
-        joi.validate(req.body, schema, (err, result) => {
-            (err) ? reject(err) : resolve(result)
+        joi.validate(driver, schema, (err, result) => {
+            (err) ? reject(invalidObject(err)) : resolve(validatedObject(result))
         })
     })
 }
@@ -31,15 +53,15 @@ module.exports.validateRegister = (req, res) => {
 * @param {String} password
 * @return {json object} response
 */
-module.exports.validateLogin = (req, res) => {
+module.exports.validateLogin = (driver) => {
     let schema = joi.object().keys({
         password: joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required(),
         email: joi.string().email({ minDomainAtoms: 2}).required()
     })
 
     return new Promise((resolve, reject) => {
-        joi.validate(req.body, schema, (err, result) => {
-            (err) ? reject(err) : resolve(result)
+        joi.validate(driver, schema, (err, result) => {
+            (err) ? reject(invalidObject(err)) : resolve(validatedObject(result))
         })
     })
 }

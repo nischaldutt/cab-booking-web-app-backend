@@ -19,10 +19,6 @@
             "description": "Driver APIs"
         },
         {
-            "name": "Booking",
-            "description": "Booking APIs"
-        },
-        {
             "name": "Admin",
             "description": "Admin APIs"
         }
@@ -52,8 +48,15 @@
                         "name": "password",
                         "in": "formData"
                     }
-
-                ]
+                ],
+                "responses": {
+                    "200": {
+                    "description": "Here is the complete history of the booking"
+                    },
+                    "400": {
+                    "description": "Didn't found anything"
+                    }
+                } 
             }
         },
         "/customer/login": {

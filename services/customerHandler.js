@@ -1,3 +1,4 @@
+
 //********** CUSTOMER HANDLER **********/
 
 const Promise                       = require('bluebird')
@@ -5,6 +6,7 @@ const Promise                       = require('bluebird')
 const connection                    = require('../database/mysql')
 const CONSTANTS                     = require('../properties/constants')
 const bcrypt                        = require('../libs/bcrypt')
+const customerUtilities            = require('../utilities/customerUtilities')
 
 /* 
 * @function <b>selectPassword </b> <br>
@@ -12,9 +14,10 @@ const bcrypt                        = require('../libs/bcrypt')
 * @param {Object} adminObj
 * @return {resolved Promise} password
 */
-let selectPassword = (userObj) => {
+const selectHash = (userObj) => {
     return new Promise((resolve, reject) => {
-        connection.query(`SELECT hash from customers WHERE email = ?`, userObj.email, (err, result) => {
+        connection.query(`SELECT hash from customers WHERE email = ?`, userObj.email, 
+        (err, result) => {
             (err) ? reject(err) : resolve(checkPassword(userObj, result[0].hash))
         })
     })
@@ -27,11 +30,11 @@ let selectPassword = (userObj) => {
 * @param {String} password
 * @return {resolved Promise} adminObj
 */
-let checkPassword = (userObj, hash) => {
+const checkPassword = (userObj, hash) => {
     return new Promise((resolve, reject) => {
         bcrypt.matchPassword(userObj.password, hash)
-            .then(result => resolve(result))
-            .catch(err => reject(err))
+        .then(() => resolve(customerUtilities.loginSuccessfull(userObj)))
+        .catch(() => reject(customerUtilities.incorrectPassword()))
     })
 }
 
@@ -42,31 +45,50 @@ let checkPassword = (userObj, hash) => {
 * @return {resolved Promise} response
 */
 module.exports.addNewCredentials = (obj) => {
+
+    delete obj.password
+    obj.hash = bcrypt.hashPass
+    
     return new Promise((resolve, reject) => {
-        connection.query(`INSERT INTO customers SET ?`, obj, (err, result) => {
-            (err) ? reject(err) : resolve(result)
+        connection.query(`INSERT INTO customers SET ?`, obj, 
+        (err, result) => {
+            (err) ? 
+            reject(customerUtilities.customerAlreadyExists(err, result)) : 
+            resolve(customerUtilities.newCustomerAdded(obj))
         })
     })
 }
 
 /* 
 * @function <b>checkIfAdminExists </b> <br>
+* check if admin exists in DB
+* @param {Object} admin 
+* @return {resolved Promise} response
+*/
+module.exports.checkIfCustomerExists = (user) => {
+    return new Promise((resolve, reject) => {
+        connection.query(`SELECT * FROM customers WHERE email = '${user.email}'`, 
+        (err, result) => {
+            ((err) || (result.length === 0)) ? 
+            reject(customerUtilities.customerNotRegistered(user.username)) : 
+            resolve(selectHash(user)) 
+        })
+    })
+}
+
+/* 
+* @function <b>checkIfAdminAlreadyExists </b> <br>
 * check if admin already exists in DB
 * @param {Object} admin 
 * @return {resolved Promise} response
 */
-module.exports.checkIfCustomerExists = (user, res) => {
+module.exports.checkIfCustomerAlredyExists = (user) => {
     return new Promise((resolve, reject) => {
-        connection.query(`SELECT * FROM customers WHERE email = '${user.email}'`, (err, result) => {
-          ((result.length === 0 ) || (err)) ? 
-            res.status(CONSTANTS.responseFlags.USER_NOT_FOUND).send({
-                data: {
-                    error: 'user not registered',
-                },
-                statusCode: CONSTANTS.responseFlags.USER_NOT_FOUND,
-                message: "User not registered!"
-            })
-         : resolve(selectPassword(user))
+        connection.query(`SELECT * FROM customers WHERE email = '${user.email}'`, 
+        (err, result) => {
+            ((err) || (result.length !== 0)) ? 
+            reject(customerUtilities.customerAlreadyExists(err, result)) : 
+            resolve(customerUtilities.newCustomerAdded(result))
         })
     })
 }
@@ -77,16 +99,30 @@ module.exports.checkIfCustomerExists = (user, res) => {
 * @param {String} email
 * @return {resolved Promise} response
 */
-module.exports.getCustomerCredentials = (email, res) => {
+module.exports.getCustomerId = (email) => {
     return new Promise((resolve, reject) => {
-        connection.query(`SELECT * from customers where email = ? `, email, (err, result) => {
-            (err) ? res.status(CONSTANTS.responseFlags.USER_NOT_FOUND).send({
-                data: {
-                    error: 'user not registered',
-                },
-                statusCode: CONSTANTS.responseFlags.USER_NOT_FOUND,
-                message: "User not registered!"
-            }) : resolve(result[0])
+        connection.query(`SELECT * from customers where email = ? `, email, 
+        (err, result) => {
+            (err) ? 
+            reject(customerUtilities.customerNotRegistered(email)) : 
+            resolve(result[0].customer_id)
+        })
+    })
+}
+
+/* 
+* @function <b>getCustomerCredentials </b> <br>
+* get customer credentials
+* @param {String} email
+* @return {resolved Promise} response
+*/
+module.exports.getCustomerCredentials = (email) => {
+    return new Promise((resolve, reject) => {
+        connection.query(`SELECT * from customers where email = ? `, email, 
+        (err, result) => {
+            (err) ? 
+            reject(customerUtilities.customerNotRegistered(email)) : 
+            resolve(result[0])
         })
     })
 }
@@ -97,9 +133,17 @@ module.exports.getCustomerCredentials = (email, res) => {
 * @param {Object} data
 * @return {callback} data
 */
-module.exports.insertBookingData = (data, callback) => {
-    connection .query(`INSERT INTO bookings (from_location, to_location, customer_id) VALUES (GeomFromText('POINT(${data.from_latitude} ${data.from_longitude})'), GeomFromText('POINT(${data.to_latitude} ${data.to_longitude})'), '${data.customer_id}')`, (err, result) => {
-        (err) ? callback(err, null) : callback(null, result)
+module.exports.insertBookingData = (data) => {
+    return new Promise((resolve, reject) => {
+        connection .query(`INSERT INTO bookings (from_location, to_location, customer_id) 
+                            VALUES (GeomFromText('POINT(${data.from_latitude} ${data.from_longitude})'), 
+                            GeomFromText('POINT(${data.to_latitude} ${data.to_longitude})'), 
+                            '${data.customer_id}')`, 
+        (err, result) => {
+            (err) ? 
+            reject(err) : 
+            resolve(customerUtilities.bookingCreated(data))
+        })
     })
 }
 
@@ -108,18 +152,13 @@ module.exports.insertBookingData = (data, callback) => {
 * get customer booking
 * @param {Number} customer_id
 */
-module.exports.getCustomerBookings = (customer_id, res) => {
+module.exports.getCustomerBookings = (customer_id) => {
     return new Promise((resolve, reject) => {
-        connection.query(`SELECT from_location, to_location, booking_time FROM bookings WHERE customer_id = '${customer_id}'`, (err, result) => {
+        connection.query(`SELECT from_location, to_location, booking_time FROM bookings WHERE customer_id = '${customer_id}'`, 
+        (err, result) => {
             ((result.length === 0 ) || (err)) ? 
-                res.status(CONSTANTS.responseFlags.USER_NOT_FOUND).send({
-                    data: {
-                        error: 'no bookings created by customer!',
-                    },
-                    statusCode: CONSTANTS.responseFlags.USER_NOT_FOUND,
-                    message: "Pleases make some bookings!"
-                })
-            : resolve(result)
+            reject(customerUtilities.noBookingsavailable()) :
+            resolve(customerUtilities.allBookings(result))
         })
     })
 }

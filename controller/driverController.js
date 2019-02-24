@@ -1,3 +1,4 @@
+
 //********** DRIVER CONTROLLER **********/
 
 const Promise                       = require('bluebird')
@@ -20,30 +21,16 @@ module.exports.registerDriver = (req, res, next) => {
     let data = {
         username: req.body.username,
         email: req.body.email,
-        hash: bcrypt.hashPass,
+        password: req.body.password,
     }
 
     Promise.coroutine(function*() {
-        yield driverValidator.validateRegister(req, res)
-
-        yield driverHandler.addNewCredentials(data)
-
-        res.status(CONSTANTS.responseFlags.ADDON_INSERTED).json({
-            data: {
-                username: data.username,
-                email: data.email
-            },
-            statusCode: CONSTANTS.responseFlags.ADDON_INSERTED,
-            message: "Driver Credentials added!"
-        })
+        yield driverValidator.validateRegister(data)
+        yield driverHandler.checkIfDriverAlredyExists(data)
+        let newDriver = yield driverHandler.addNewCredentials(data)
+        res.status(CONSTANTS.responseFlags.ADDON_INSERTED).json(newDriver)
     })()
-    .catch(err => res.status(CONSTANTS.responseFlags.ADDON_DEACTIVATED).send({
-        data: {
-            error: err.details,
-        },
-        statusCode: CONSTANTS.responseFlags.ADDON_DEACTIVATED,
-        message: "Error while inserting credentials!"
-    }))    
+    .catch(err => res.status(CONSTANTS.responseFlags.ACTION_NOT_ALLOWED).json(err))   
 }
 
 /* 
@@ -60,20 +47,11 @@ module.exports.login = (req, res, next) => {
     }
 
     Promise.coroutine(function*() {
-        yield driverValidator.validateLogin(req, res)
-
-        yield driverHandler.checkIfDriverExists(data, res)
+        yield driverValidator.validateLogin(data)
+        yield driverHandler.checkIfDriverExists(data)
         next()
     })()
-    .catch(err => {
-        res.status(CONSTANTS.responseFlags.ADDON_DEACTIVATED).send({
-            data: {
-                error: err.details,
-            },
-            statusCode: CONSTANTS.responseFlags.ADDON_DEACTIVATED,
-            message: "Error while inserting credentials!"
-        })
-    })
+    .catch(err => res.status(CONSTANTS.responseFlags.ACTION_NOT_ALLOWED).json(err))
 }
 
 /* 
@@ -98,25 +76,11 @@ module.exports.completeBooking = (req, res, next) => {
 
         let driver_id = yield driverHandler.getDriverId(data.email)
 
-        yield driverHandler.completeBooking(driver_id, data.booking_id, data.completion_time)
+        let completed = yield driverHandler.completeBooking(driver_id, data.booking_id, data.completion_time)
 
-        res.status(CONSTANTS.responseFlags.ACTION_COMPLETE).json({
-            data: {
-                booking_id: data.booking_id,
-                driver_id : driver_id,
-                email: data.email
-            },
-            statusCode: CONSTANTS.responseFlags.ACTION_COMPLETE,
-            message: "Booking completed!"
-        })
+        res.status(CONSTANTS.responseFlags.ACTION_COMPLETE).json(completed)
     })()
-    .catch(err => res.status(CONSTANTS.responseFlags.ACTION_NOT_ALLOWED).send({
-        data: {
-            error: err.details,
-        },
-        statusCode: CONSTANTS.responseFlags.ACTION_NOT_ALLOWED,
-        message: "Invalid input!"
-    }))  
+    .catch(err => res.status(CONSTANTS.responseFlags.ACTION_NOT_ALLOWED).send(err)) 
 }
 
 /* 
@@ -141,19 +105,7 @@ module.exports.viewBookings = (req, res, next) => {
         
         let result = yield driverHandler.getDriverBookings(driver_id, data.completed)
 
-        res.status(CONSTANTS.responseFlags.ACTION_COMPLETE).json({
-            data: {
-                result
-            },
-            statusCode: CONSTANTS.responseFlags.ACTION_COMPLETE,
-            message: "Get all Bookings driver!"
-        })
+        res.status(CONSTANTS.responseFlags.ACTION_COMPLETE).json(result)
     })()
-    .catch(err => res.status(CONSTANTS.responseFlags.ACTION_NOT_ALLOWED).send({
-        data: {
-            error: err.details,
-        },
-        statusCode: CONSTANTS.responseFlags.ACTION_NOT_ALLOWED,
-        message: "Invalid input!"
-    }))  
+    .catch(err => res.status(CONSTANTS.responseFlags.ACTION_NOT_ALLOWED).json(err))  
 }

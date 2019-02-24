@@ -1,6 +1,8 @@
+
 /******* BCRYPT *******/
 
-const bcrypt = require('bcrypt')
+const bcrypt                        = require('bcrypt')
+const CONSTANTS                     = require('../properties/constants')
 
 /* 
 * @function <b>hashPassword </b> <br>
@@ -24,7 +26,7 @@ exports.hashPassword = async (req, res, next) => {
 exports.matchPassword = (plainText, hashPassword) => {
     return new Promise((resolve, reject) => {
         bcrypt.compare(plainText, hashPassword, (err, result) => {
-            (err) ? reject(err) : resolve(result)
+            (result) ? resolve(result) : reject(result)
         })
     })
 }

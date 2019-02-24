@@ -1,9 +1,11 @@
+
 /******* JWT TOKEN *******/
 
 const jwt                       = require('jsonwebtoken')
 
 const CONSTANTS                 = require('../properties/constants')
 const connection                = require('../database/mysql')
+const tokenUtilities            = require('../utilities/tokenUtilities')
 
 const privateKey = 'secret'
 
@@ -14,17 +16,13 @@ const privateKey = 'secret'
 * @param {Table} tableName
 * @return {json object} response
 */
-let extractToken = (obj, tableName, res) => {
+let extractToken = (obj, tableName) => {
     return new Promise((resolve, reject) => {
-        connection.query(`SELECT token FROM ${tableName} WHERE email = ? `, obj.email, (err, result) => {
-            (result[0] === undefined) ? 
-            res.status(CONSTANTS.responseFlags.USER_NOT_FOUND).send({
-                data: {
-                    error: 'Not registered!',
-                },
-                statusCode: CONSTANTS.responseFlags.USER_NOT_FOUND,
-                message: `${tableName} not registered!`
-            }) : resolve(result[0].token)
+        connection.query(`SELECT token FROM ${tableName} WHERE email = ? `, obj.email, 
+        (err, result) => {
+            (result.length === 0) ? 
+            reject(tokenUtilities.notLogin(tableName)) : 
+            resolve(result[0].token)
         })
     })   
 }
@@ -70,33 +68,16 @@ module.exports.createToken = (tableName) => {
 * @param {String} tableName
 * @return {json object} response
 */
-module.exports.accessToken = (tableName) => {
-    return async (req, res, next) => {
-        try {
-            let data = {
-                email: req.body.email,
-            }
-            let token = await extractToken(data, tableName, res)
-
+module.exports.accessToken = (tableName, data) => {
+    return new Promise((resolve, reject) => {
+        extractToken(data, tableName)
+        .then((token) => {
             jwt.verify(token, privateKey, (err, payload) => {
-                (err) ? res.status(CONSTANTS.responseFlags.INVALID_ACCESS_TOKEN).json({
-                    data: {
-                        error: err.message,
-                    },
-                    statusCode: CONSTANTS.responseFlags.INVALID_ACCESS_TOKEN,
-                    message: "Token Expired!"
-                }) : res.locals.email = data.email
-                next()
+                (err) ? 
+                reject(tokenUtilities.tokenExpired(err)) : 
+                resolve(data.email)
             })
-        }
-        catch(err) {
-            res.status(CONSTANTS.responseFlags.INVALID_EMAIL_ID).json({
-                data: {
-                    error: err.message,
-                },
-                statusCode: CONSTANTS.responseFlags.INVALID_EMAIL_ID,
-                message: "Invalid credentials!"
-            })
-        }
-    }
+        })
+        .catch(err => reject(tokenUtilities.invalidCredentials(err)))
+    })
 }

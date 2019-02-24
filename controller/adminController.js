@@ -1,7 +1,9 @@
+
 //********** ADMIN CONTROLLER **********/
 
 const adminHandler                  = require('../services/adminHandler')
 const CONSTANTS                     = require('../properties/constants')
+const bookingUtilities              = require('../utilities/bookingUtilities')
 
 const admins = [
     {
@@ -17,18 +19,35 @@ const admins = [
 ]
 
 /* 
+* @function <b> registerAdmins </b> <br>
+* Register 2 admins to DB while starting server
+*/
+module.exports.registerAdmins = async (req, res, next) => {
+    let registered = await adminHandler.alreadyRegistered()
+    if(registered) {
+        next()
+    } else {
+        await adminHandler.addNewCredentials(admins)
+        next()
+    }
+}
+
+/* 
 * @function <b> Login </b> <br>
 * Admin login
 */
 module.exports.login = async (req, res, next) => {
-    let data = {
-        username: admins[0].username,
-        email: admins[0].email,
-        password: admins[0].password,
-    }
+    try {
+        let data = {
+            email: req.body.email,
+            password: req.body.password,
+        }
 
-    await adminHandler.checkIfAdminExists(data)
-    next()
+        await adminHandler.checkIfAdminExists(data)
+        next()
+    } catch (err) {
+        res.status(CONSTANTS.responseFlags.ACTION_NOT_ALLOWED).json(err)
+    }
 }
 
 /* 
@@ -37,19 +56,10 @@ module.exports.login = async (req, res, next) => {
 */
 module.exports.getAllBookings = async (req, res, next) => {
     let result = await adminHandler.getAllBookings()
-    return (result) ? res.status(CONSTANTS.responseFlags.ACTION_COMPLETE).json({
-        data: {
-            bookings: result
-        },
-        statusCode: CONSTANTS.responseFlags.ACTION_COMPLETE,
-        message: "Retrieved all bookings!"
-    }) : res.status(CONSTANTS.responseFlags.NO_DATA_FOUND).json({
-        data: {
-            bookings: {}
-        },
-        statusCode: CONSTANTS.responseFlags.NO_DATA_FOUND,
-        message: "No data found!"
-    })
+    return (result) ? res.status(CONSTANTS.responseFlags.ACTION_COMPLETE)
+    .json(bookingUtilities.retrievedBookings(result)) : 
+    res.status(CONSTANTS.responseFlags.NO_DATA_FOUND)
+    .json(bookingUtilities.noBookingsFound)
 }
 
 /* 
@@ -63,35 +73,13 @@ module.exports.assignBooking = async (req, res, next) => {
         let driver_id = req.body.driver_id
         let booking_id = req.body.booking_id
 
-        let admin_id = await adminHandler.getAdminId(res.locals.email, res)
-
-        adminHandler.assignBooking(admin_id, driver_id, booking_id, (err, result) => {
-            return (result) ? res.status(CONSTANTS.responseFlags.ACTION_COMPLETE).json({
-                data: {
-                    admin_id: admin_id,
-                    booking_id: booking_id,
-                    driver_id: driver_id
-                },
-                statusCode: CONSTANTS.responseFlags.ACTION_COMPLETE,
-                message: 'Booking assigned!'
-            }) : res.status(CONSTANTS.responseFlags.ERROR_IN_EXECUTION).json({
-                data: {
-                    admin_id: admin_id,
-                    booking_id: booking_id,
-                    driver_id: driver_id
-                },
-                statusCode: CONSTANTS.responseFlags.ERROR_IN_EXECUTION,
-                message: "Cannot assign booking!"
-            })
-        })
+        let admin_id = await adminHandler.getAdminId(req.body.email)
+        console.log(admin_id)
+        let assigned = await adminHandler.assignBooking(admin_id, driver_id, booking_id)
+        console.log(assigned)
+        res.status(CONSTANTS.responseFlags.ACTION_COMPLETE).json(assigned)
     } 
     catch(err) {
-        res.status(CONSTANTS.responseFlags.DUPLICATE_ADDONS).json({
-            data: {
-                driver_id: req.body.driver_id,
-            },
-            statusCode: CONSTANTS.responseFlags.DUPLICATE_ADDONS,
-            message: 'Driver already assigned!'
-        })
+        res.status(CONSTANTS.responseFlags.DUPLICATE_ADDONS).json(err)
     }
 }

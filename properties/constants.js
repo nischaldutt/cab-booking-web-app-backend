@@ -1,6 +1,9 @@
-//FLAGS
+
+/****** FLAGS ******/
 
 exports.responseFlags = {
+    VALIDATION_SUCCESS            : 200,
+    INVALID_INPUT                 : 400,
     INVALID_USER_ID               : 400,
     ADDON_UPDATED                 : 200,
     ADDON_INSERTED                : 200,
@@ -14,7 +17,7 @@ exports.responseFlags = {
     INVALID_ACCESS_TOKEN          : 101,
     INVALID_USERNAME              : 201,
     INVALID_EMAIL_ID              : 201,
-    ACTION_NOT_ALLOWED            : 201,
+    ACTION_NOT_ALLOWED            : 400,
     INVALID_ACCESS                : 201,
     WRONG_PASSWORD                : 201,
     WRONG_OLD_PASSWORD            : 201,

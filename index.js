@@ -1,8 +1,8 @@
-/**
+/*********************************
  * TAXI BOOKING MANAGEMENT SYSTEM
  * created by Nischal Dutt 
  * on 21/02/2019
- */
+*********************************/
 
 const express                       = require('express')
 const bodyParser                    = require('body-parser')
@@ -36,7 +36,7 @@ db.connect((err) => {
         process.exit(1)
     }
     else {
-        app.listen(3000, () => {
+        app.listen(process.env.NODE || 3000, () => {
             console.log('server online !')
         })
     }
