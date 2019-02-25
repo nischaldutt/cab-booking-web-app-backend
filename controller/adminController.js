@@ -23,12 +23,14 @@ const admins = [
 * Register 2 admins to DB while starting server
 */
 module.exports.registerAdmins = async (req, res, next) => {
-    let registered = await adminHandler.alreadyRegistered()
-    if(registered) {
-        next()
-    } else {
-        await adminHandler.addNewCredentials(admins)
-        next()
+    try {
+        let registered = await adminHandler.alreadyRegistered();
+        (registered) ?
+        next():
+        (await adminHandler.addNewCredentials(admins),
+        next())
+    } catch(err) {
+        console.log(err)
     }
 }
 
@@ -59,7 +61,7 @@ module.exports.getAllBookings = async (req, res, next) => {
     return (result) ? res.status(CONSTANTS.responseFlags.ACTION_COMPLETE)
     .json(bookingUtilities.retrievedBookings(result)) : 
     res.status(CONSTANTS.responseFlags.NO_DATA_FOUND)
-    .json(bookingUtilities.noBookingsFound)
+    .json(bookingUtilities.noBookingsFound())
 }
 
 /* 
@@ -73,10 +75,12 @@ module.exports.assignBooking = async (req, res, next) => {
         let driver_id = req.body.driver_id
         let booking_id = req.body.booking_id
 
+        await adminHandler.checkIfDriverAssigned(driver_id)
+
         let admin_id = await adminHandler.getAdminId(req.body.email)
-        console.log(admin_id)
+        //console.log(admin_id)
         let assigned = await adminHandler.assignBooking(admin_id, driver_id, booking_id)
-        console.log(assigned)
+        //console.log(assigned)
         res.status(CONSTANTS.responseFlags.ACTION_COMPLETE).json(assigned)
     } 
     catch(err) {

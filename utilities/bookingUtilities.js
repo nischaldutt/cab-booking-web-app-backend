@@ -24,10 +24,10 @@ module.exports.noBooking = (admin_id, driver_id, booking_id) => {
     }
 }
 
-module.exports.driverAlreadyAssigned = () => {
+module.exports.driverAlreadyAssigned = (driver_id) => {
     return {
         data: {
-            driver_id: req.body.driver_id,
+            driver_id: driver_id,
         },
         statusCode: CONSTANTS.responseFlags.DUPLICATE_ADDONS,
         message: 'Driver already assigned!'

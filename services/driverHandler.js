@@ -98,7 +98,7 @@ module.exports.checkIfDriverExists = (user) => {
         (err, result) => {
             ((err) || (result.length === 0)) ? 
             reject(driverUtilities.driverNotRegistered(user.username)) : 
-            resolve(driverUtilities.selectPassword(user)) 
+            resolve(selectPassword(user)) 
         })
     })
 }

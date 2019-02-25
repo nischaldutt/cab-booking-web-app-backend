@@ -93,14 +93,14 @@ module.exports.validateCompleteBooking = (req, res) => {
 * @param {Number} completed
 * @return {json object} response
 */
-module.exports.validateViewBookings = (req, res) => {
+module.exports.validateViewBookings = (data) => {
     let schema = joi.object().keys({
         email: joi.string().email({ minDomainAtoms: 2}).required(),
         completed: joi.number().integer().required()
     })
 
     return new Promise((resolve, reject) => {
-        joi.validate(req.body, schema, (err, result) => {
+        joi.validate(data, schema, (err, result) => {
             (err) ? reject(err) : resolve(result)
         })
     })

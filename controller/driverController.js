@@ -94,13 +94,10 @@ module.exports.completeBooking = (req, res, next) => {
 */
 module.exports.viewBookings = (req, res, next) => {
     let data = {
-        driver_email: req.body.email,
-        completed: req.body.completed
+        driver_email: req.query.email,
+        completed: req.query.completed
     }
-
     Promise.coroutine(function*() {
-        yield driverValidator.validateViewBookings(req, res)
-
         let driver_id = yield driverHandler.getDriverId(data.driver_email)
         
         let result = yield driverHandler.getDriverBookings(driver_id, data.completed)

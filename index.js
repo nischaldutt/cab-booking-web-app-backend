@@ -36,7 +36,7 @@ db.connect((err) => {
         process.exit(1)
     }
     else {
-        app.listen(process.env.NODE || 3000, () => {
+        app.listen(process.env.PORT || 3000, () => {
             console.log('server online !')
         })
     }

@@ -77,7 +77,7 @@ const pushLogs = (admin_id, driver_id, booking_id, currentTime) => {
             booking_time: currentTime,
         })
     } catch (e) {
-        console.log(e)
+        throw(e)
     }
 }
 
@@ -164,13 +164,13 @@ module.exports.getAllBookings = () => {
 * @param {Number} driver_id 
 * @return {resolved Promise} response
 */
-module.exports.checkIfDriverAssigned =(res, driver_id) => {
+module.exports.checkIfDriverAssigned =(driver_id) => {
     return new Promise((resolve, reject) => {
         connection.query(`SELECT assigned FROM drivers WHERE driver_id = '${driver_id}'`, (err, result) => {
             ((err) ? 
             reject(err) : 
-            (result[0].assigned === 1) ? reject(err): resolve(result[0].assigned)
-            )
+            (result[0].assigned === 1) ? 
+            reject(bookingUtilities.driverAlreadyAssigned(driver_id)): resolve())
         })
     })
 }
