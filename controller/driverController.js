@@ -74,6 +74,8 @@ module.exports.completeBooking = (req, res, next) => {
     Promise.coroutine(function* () {
         yield driverValidator.validateCompleteBooking(req, res)
 
+        yield driverHandler.checkIfBookingExists(data.booking_id)
+
         let driver_id = yield driverHandler.getDriverId(data.email)
 
         let completed = yield driverHandler.completeBooking(driver_id, data.booking_id, data.completion_time)
@@ -100,7 +102,9 @@ module.exports.viewBookings = (req, res, next) => {
     Promise.coroutine(function*() {
         let driver_id = yield driverHandler.getDriverId(data.driver_email)
         
-        let result = yield driverHandler.getDriverBookings(driver_id, data.completed)
+        let booking_id = yield driverHandler.getBookingId(driver_id)
+
+        let result = yield driverHandler.getDriverBookings(booking_id, data.completed)
 
         res.status(CONSTANTS.responseFlags.ACTION_COMPLETE).json(result)
     })()

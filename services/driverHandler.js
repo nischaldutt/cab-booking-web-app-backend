@@ -8,6 +8,7 @@ const bcrypt                        = require('../libs/bcrypt')
 const CONSTANTS                     = require('../properties/constants')
 const db                            = require('../database/mongodb')
 const driverUtilities               = require('../utilities/driverUtilities')
+const bookingUtilities               = require('../utilities/bookingUtilities')
 
 /* 
 * @function <b>updateLogs </b> <br>
@@ -61,6 +62,22 @@ module.exports.getDriverId = (email) => {
     return new Promise((resolve, reject) => {
         connection.query(`SELECT driver_id FROM drivers WHERE email = ? `, email, (err, result) => {
             (err) ? reject(err) : resolve(result[0].driver_id)
+        })
+    })
+}
+
+/* 
+* @function <b>getAdminId </b> <br>
+* Get Admin Id
+* @param {String} email
+* @return {resolved Promise} response
+*/
+module.exports.getBookingId = (driver_id) => {
+    return new Promise((resolve, reject) => {
+        connection.query(`SELECT booking_id FROM bookings WHERE driver_id = ? `, driver_id, (err, result) => {
+            (err || result.length === 0) ? 
+            reject(bookingUtilities.noBookingsFound()) : 
+            resolve(result[0].booking_id)
         })
     })
 }
@@ -121,6 +138,23 @@ module.exports.checkIfDriverAlredyExists = (user) => {
 }
 
 /* 
+* @function <b>checkIfBookingExists </b> <br>
+* check if admin already exists in DB
+* @param {Object} admin 
+* @return {resolved Promise} response
+*/
+module.exports.checkIfBookingExists = (booking_id) => {
+    return new Promise((resolve, reject) => {
+        connection.query(`SELECT * FROM bookings WHERE booking-id = '${booking_id}'`, 
+        (err, result) => {
+            ((err) || (result.length !== 0)) ? 
+            reject(bookingUtilities.noBookingsFound()) : 
+            resolve()
+        })
+    })
+}
+
+/* 
 * @function <b>completeBooking </b> <br>
 * MARK BOOKING COMPLETE IN db
 * @param {Number} driver_id
@@ -145,15 +179,15 @@ module.exports.completeBooking = (driver_id, booking_id, completion_time) => {
 * @param {Number} completed
 * @return {resolved Promise} response
 */
-module.exports.getDriverBookings = (driver_id, completed) => {
+module.exports.getDriverBookings = (booking_id, completed) => {
     return new Promise((resolve, reject) => {
         connection.query(`SELECT bookings.from_location, bookings.to_location, bookings.booking_time, bookings.completed, drivers.username 
                           FROM bookings 
                           INNER JOIN drivers ON drivers.driver_id = bookings.driver_id 
-                          WHERE completed = '${completed}'`, 
+                          WHERE completed = '${completed}' AND booking_id = '${booking_id}'`, 
             (err, result) => {
-            (err) ? 
-            reject(err) : 
+            (err || result.length === 0) ? 
+            reject(bookingUtilities.noBookingsFound()) : 
             resolve(driverUtilities.allBookings(result))
         })
     })
