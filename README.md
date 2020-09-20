@@ -1,2 +1,2 @@
-# backend-project
-TAXI BOOKING MANAGEMENT SYSTEM
+# Backend of a Cab Booking App
+Written in Node and Express
