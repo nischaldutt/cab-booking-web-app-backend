@@ -1,400 +1,410 @@
 {
-    "swagger": "2.0",
-    "info": {
-        "version": "1.0.0",
-        "description": "TAXI BOOKING MANAGEMENT SYSTEM",
-        "title": "Swagger"
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "description": "CAB BOOKING MANAGEMENT SYSTEM",
+    "title": "Swagger"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "tags": [
+    {
+      "name": "Customer",
+      "description": "Customer APIs"
     },
-    "host": "localhost:3000",
-    "basePath": "/",
-    "schemes": [
-        "http"
-    ],
-    "tags": [{
-            "name": "Customer",
-            "description": "Customer APIs"
-        },
-        {
-            "name": "Driver",
-            "description": "Driver APIs"
-        },
-        {
-            "name": "Admin",
-            "description": "Admin APIs"
-        }
-    ],
-    "paths": {
-        "/customer/register": {
-            "post": {
-                "tags": [
-                    "Customer"
-                ],
-                "description": "Customer Registeration",
-                "parameters": [{
-                        "type": "string",
-                        "description": "Customer userName",
-                        "name": "username",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Customer email",
-                        "name": "email",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Customer password",
-                        "name": "password",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                    "description": "Customer registered successfully"
-                    },
-                    "400": {
-                    "description": "Registration unsuccessfull"
-                    }
-                } 
-            }
-        },
-        "/customer/login": {
-            "post": {
-                "tags": [
-                    "Customer"
-                ],
-                "description": "Login in the customer",
-                "parameters": [{
-                        "type": "string",
-                        "description": "Customer email",
-                        "name": "email",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Customer password",
-                        "name": "password",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                    "description": "login successfull"
-                    },
-                    "400": {
-                    "description": "login unsuccessfull"
-                    }
-                }
-            }
-        },
-        "/customer/create-booking": {
-            "post": {
-                "tags": [
-                    "Customer"
-                ],
-                "description": "Create a booking for user from source to destination",
-                "parameters": [{
-                        "type": "string",
-                        "description": "customer email",
-                        "name": "email",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "from_latitude",
-                        "name": "from_latitude",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "from_longitude",
-                        "name": "from_longitude",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "to_latitude",
-                        "name": "to_latitude",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "to_longitude",
-                        "name": "to_longitude",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                    "description": "Booking created"
-                    },
-                    "400": {
-                    "description": "Booking failed"
-                    },
-                    "201": {
-                    "description": "Booking failed"
-                    }
-                }
-            }
-        },
-        "/customer/view-bookings": {
-            "get": {
-                "tags": [
-                    "Customer"
-                ],
-                "description": "Get booking history of the client",
-                "parameters": [{
-                    "type": "string",
-                    "description": "customer email",
-                    "name": "email",
-                    "in": "query"
-                }],
-                "responses": {
-                    "200": {
-                    "description": "Here is the complete history of the booking"
-                    },
-                    "400": {
-                    "description": "Didn't found anything"
-                    },
-                    "201": {
-                    "description": "Error occured"
-                    }
-                }
-            }
-        },
-        "/driver/register": {
-            "post": {
-                "tags": [
-                    "Driver"
-                ],
-                "description": "Register driver",
-                "parameters": [{
-                        "type": "string",
-                        "description": "Driver username",
-                        "name": "username",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Driver email",
-                        "name": "email",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Driver password",
-                        "name": "password",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                    "description": "Registration successfull"
-                    },
-                    "400": {
-                    "description": "Registration unsuccessfull"
-                    },
-                    "201": {
-                    "description": "error occured"
-                    }
-                }
-            }
-        },
-        "/driver/login": {
-            "post": {
-                "tags": [
-                    "Driver"
-                ],
-                "description": "Login in the user",
-                "parameters": [{
-                        "type": "string",
-                        "description": "Driver email",
-                        "name": "email",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Driver password",
-                        "name": "password",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                    "description": "Login successfull"
-                    },
-                    "400": {
-                    "description": "Login unsuccessfull"
-                    },
-                    "201": {
-                    "description": "Login unsuccessfull"
-                    }
-                }
-            }
-        },
-        "/driver/complete-booking": {
-            "put": {
-                "tags": [
-                    "Driver"
-                ],
-                "description": "Complete current bookings",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Driver email",
-                        "name": "email",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "booking id",
-                        "name": "booking_id",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                    "description": "Booking marked complete"
-                    },
-                    "400": {
-                    "description": "task incomplete"
-                    },
-                    "201": {
-                    "description": "task incomplete"
-                    }
-                }
-            }
-        },
-        "/driver/view-bookings": {
-            "get": {
-                "tags": [
-                    "Driver"
-                ],
-                "description": "Get booking history of the driver",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Driver email",
-                        "name": "email",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "view completed(1) or current booking(0)",
-                        "name": "completed",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                    "description": "Here is the complete history of the bookings of driver"
-                    },
-                    "400": {
-                    "description": "Didn't found anything"
-                    },
-                    "201": {
-                    "description": "Didn't found anything"
-                    }
-                }
-            }
-        },
-        "/admin/login": {
-            "post": {
-                "tags": [
-                    "Admin"
-                ],
-                "description": "Login the admin",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Admin email",
-                        "name": "email",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Admin password",
-                        "name": "password",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                    "description": "Login successfullg"
-                    },
-                    "400": {
-                    "description": "Login unsuccessfull"
-                    },
-                    "201": {
-                    "description": "Login unsuccessfull"
-                    }
-                }
-            }
-        },
-        "/admin/assign-booking": {
-            "put": {
-                "tags": [
-                    "Admin"
-                ],
-                "description": "Assign drivers to pending bookings",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Admin email",
-                        "name": "email",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "driver_id",
-                        "name": "driver_id",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "booking_id",
-                        "name": "booking_id",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                    "description": "Driver assigned"
-                    },
-                    "400": {
-                    "description": "Driver not assigned"
-                    },
-                    "201": {
-                    "description": "Driver not assigned"
-                    }
-                }
-            }
-        },
-        "/admin/get-all-bookings": {
-            "get": {
-                "tags": [
-                    "Admin"
-                ],
-                "description": "Get complete details of a booking",
-                "parameters": [{
-                    "type": "string",
-                    "description": "Admin email",
-                    "name": "email",
-                    "in": "query"
-                }],
-                "responses": {
-                    "200": {
-                    "description": "Here is the complete history of the booking"
-                    },
-                    "400": {
-                    "description": "Didn't found anything"
-                    },
-                    "201": {
-                    "description": "Didn't found anything"
-                    }
-                }
-            }
-        }
+    {
+      "name": "Driver",
+      "description": "Driver APIs"
+    },
+    {
+      "name": "Admin",
+      "description": "Admin APIs"
     }
+  ],
+  "paths": {
+    "/customer/register": {
+      "post": {
+        "tags": [
+          "Customer"
+        ],
+        "description": "Customer Register",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Customer userName",
+            "name": "username",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "description": "Customer email",
+            "name": "email",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "description": "Customer password",
+            "name": "password",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer registered successfully"
+          },
+          "400": {
+            "description": "Registration unsuccessfull"
+          }
+        }
+      }
+    },
+    "/customer/login": {
+      "post": {
+        "tags": [
+          "Customer"
+        ],
+        "description": "Login in the customer",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Customer email",
+            "name": "email",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "description": "Customer password",
+            "name": "password",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "login successfull"
+          },
+          "400": {
+            "description": "login unsuccessfull"
+          }
+        }
+      }
+    },
+    "/customer/create-booking": {
+      "post": {
+        "tags": [
+          "Customer"
+        ],
+        "description": "Create a booking for user from source to destination",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "customer email",
+            "name": "email",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "description": "from_latitude",
+            "name": "from_latitude",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "description": "from_longitude",
+            "name": "from_longitude",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "description": "to_latitude",
+            "name": "to_latitude",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "description": "to_longitude",
+            "name": "to_longitude",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booking created"
+          },
+          "400": {
+            "description": "Booking failed"
+          },
+          "201": {
+            "description": "Booking failed"
+          }
+        }
+      }
+    },
+    "/customer/view-bookings": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "description": "Get booking history of the client",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "customer email",
+            "name": "email",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Here is the complete history of the booking"
+          },
+          "400": {
+            "description": "Didn't found anything"
+          },
+          "201": {
+            "description": "Error occured"
+          }
+        }
+      }
+    },
+    "/driver/register": {
+      "post": {
+        "tags": [
+          "Driver"
+        ],
+        "description": "Register driver",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Driver username",
+            "name": "username",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "description": "Driver email",
+            "name": "email",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "description": "Driver password",
+            "name": "password",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registration successfull"
+          },
+          "400": {
+            "description": "Registration unsuccessfull"
+          },
+          "201": {
+            "description": "error occured"
+          }
+        }
+      }
+    },
+    "/driver/login": {
+      "post": {
+        "tags": [
+          "Driver"
+        ],
+        "description": "Login in the user",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Driver email",
+            "name": "email",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "description": "Driver password",
+            "name": "password",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successfull"
+          },
+          "400": {
+            "description": "Login unsuccessfull"
+          },
+          "201": {
+            "description": "Login unsuccessfull"
+          }
+        }
+      }
+    },
+    "/driver/complete-booking": {
+      "put": {
+        "tags": [
+          "Driver"
+        ],
+        "description": "Complete current bookings",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Driver email",
+            "name": "email",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "description": "booking id",
+            "name": "booking_id",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booking marked complete"
+          },
+          "400": {
+            "description": "task incomplete"
+          },
+          "201": {
+            "description": "task incomplete"
+          }
+        }
+      }
+    },
+    "/driver/view-bookings": {
+      "get": {
+        "tags": [
+          "Driver"
+        ],
+        "description": "Get booking history of the driver",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Driver email",
+            "name": "email",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "view completed(1) or current booking(0)",
+            "name": "completed",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Here is the complete history of the bookings of driver"
+          },
+          "400": {
+            "description": "Didn't found anything"
+          },
+          "201": {
+            "description": "Didn't found anything"
+          }
+        }
+      }
+    },
+    "/admin/login": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "description": "Login the admin",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Admin email",
+            "name": "email",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "description": "Admin password",
+            "name": "password",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successfullg"
+          },
+          "400": {
+            "description": "Login unsuccessfull"
+          },
+          "201": {
+            "description": "Login unsuccessfull"
+          }
+        }
+      }
+    },
+    "/admin/assign-booking": {
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "description": "Assign drivers to pending bookings",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Admin email",
+            "name": "email",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "description": "driver_id",
+            "name": "driver_id",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "description": "booking_id",
+            "name": "booking_id",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Driver assigned"
+          },
+          "400": {
+            "description": "Driver not assigned"
+          },
+          "201": {
+            "description": "Driver not assigned"
+          }
+        }
+      }
+    },
+    "/admin/get-all-bookings": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "description": "Get complete details of a booking",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Admin email",
+            "name": "email",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Here is the complete history of the booking"
+          },
+          "400": {
+            "description": "Didn't found anything"
+          },
+          "201": {
+            "description": "Didn't found anything"
+          }
+        }
+      }
+    }
+  }
 }
