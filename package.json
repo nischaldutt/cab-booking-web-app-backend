@@ -1,7 +1,7 @@
 {
-  "name": "assignment2",
+  "name": "Cab Booking Web App",
   "version": "1.0.0",
-  "description": "complete order delivery management system",
+  "description": "Backend of cab booking app in express.js",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
