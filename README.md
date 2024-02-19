@@ -19,6 +19,8 @@
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/nischaldutt/cab-booking-web-app-backend)
 [![GNU Licence](https://img.shields.io/badge/Licence-GNU-blue)](https://github.com/nischaldutt/cab-booking-web-app-backend)
 
+## [Open in Visual Studio Code 👨‍💻](https://vscode.dev/github.com/nischaldutt/cab-booking-web-app-backend/)
+
 ## Features
 
 - 🚖 Complete backend including basic API's of customer, driver(fleet) and admin.
